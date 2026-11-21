@@ -1,6 +1,6 @@
 # Spec: 0002-change-classes
 
-Status: draft
+Status: approved
 Risk: higher
 <!-- draft -> approved (a human sets this) -> done. The acceptance lock is off by default, so no lock step. -->
 <!-- Risk is higher because this changes the gate tooling and the agent's rules. -->
