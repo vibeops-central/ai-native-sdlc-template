@@ -26,15 +26,19 @@ intent.md → spec.md + acceptance tests → (human approves, locks) → plan.md
 
 | Rule | How |
 |---|---|
+| A PR is docs-only, or includes an approved, locked change | CI: `gate.py pr-check` |
 | Every change has an intent and a spec with a status | CI: `gate.py check` |
 | An approved spec has a plan and locked acceptance tests | CI: `gate.py check` |
 | Approved acceptance tests can't change without a human | CI (hash in `acceptance.lock`) + CODEOWNERS |
 | The agent can't edit approved tests or the lock, or run the lock | Claude Code hook (`.claude/hooks/`) |
 | Approved acceptance tests pass | CI: `gate.py test` |
-| Plan matches the diff, scope, evidence of "done" | Review, against `REVIEW.md` |
+| Plan matches the diff, scope, evidence of "done", risk class | Review, against `REVIEW.md` |
 
 The hook covers Claude Code's file tools and obvious shell commands; it is a guardrail, not
 a sandbox. CI is the gate that counts.
+
+Docs-only changes skip the change folder but still need a reviewed PR. See "Change
+classes" in `AGENTS.md`.
 
 ## Try it (about 10 minutes)
 

@@ -21,6 +21,21 @@ Every change goes through five steps, as files in `changes/<NNNN-slug>/`:
 
 Start a change with `python scripts/gate.py new <slug>`.
 
+## Change classes
+
+Anthropic's playbook leaves "what counts as higher risk" to each team. This repo uses three
+classes. CI checks the first two (`gate.py pr-check`); reviewers check the third.
+
+| Class | What it is | What it needs | Who approves |
+|---|---|---|---|
+| **Docs-only** | Only `.md`/`.txt` files, `docs/`, `LICENSE` | A PR, reviewed against REVIEW.md. No change folder. | The engineer |
+| **Routine** | Any other change | The full loop above | The engineer |
+| **Higher risk** | Auth, payments, personal data, money movement, the gate tooling, the agent's rules | The full loop, with `Risk: higher` in the spec | A tech lead or second human |
+
+**These are never docs:** `AGENTS.md`, `CLAUDE.md`, `REVIEW.md`, `.claude/`, `.github/`,
+`scripts/`, `docs/templates/`. They change how agents and gates behave, so they get the full
+loop. If you are unsure of the class, use the stricter one.
+
 ## Hard rules
 
 - **Never edit approved acceptance tests** or any `acceptance.lock`, and never run
@@ -35,8 +50,9 @@ Start a change with `python scripts/gate.py new <slug>`.
 ## Commands
 
 ```bash
-python scripts/gate.py check      # the SDLC gates (what CI runs)
-python -m pytest                  # all tests
+python scripts/gate.py check            # the SDLC gates (what CI runs)
+python scripts/gate.py pr-check main    # the change-class check CI runs on a PR
+python -m pytest                        # all tests
 ```
 
 ## Project-specific rules

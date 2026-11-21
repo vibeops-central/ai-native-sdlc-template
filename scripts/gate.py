@@ -8,6 +8,7 @@ acceptance tests live in tests/acceptance/<NNNN-slug>/.
     python scripts/gate.py lock <change>   a HUMAN runs this after approving the spec
     python scripts/gate.py check           run in CI: fails if a gate is not met
     python scripts/gate.py test            run the acceptance tests of approved changes
+    python scripts/gate.py pr-check <base> run in CI on a PR: docs-only, or an approved change
 
 The lock is the "answer key rule": once a spec is approved, its acceptance tests are pinned
 by hash. The agent can add other tests, but a change to the approved ones fails the gate
@@ -116,6 +117,67 @@ def cmd_test() -> int:
     return subprocess.call([sys.executable, "-m", "pytest", "-q", *paths], cwd=ROOT)
 
 
+RULE_FILES = {"AGENTS.md", "CLAUDE.md", "REVIEW.md"}
+RULE_DIRS = (".claude/", ".github/", "scripts/", "docs/templates/")
+NEVER_DOCS = ("changes/", "tests/")
+
+
+def is_rule_file(path: str) -> bool:
+    return path in RULE_FILES or path.startswith(RULE_DIRS)
+
+
+def is_docs_file(path: str) -> bool:
+    if is_rule_file(path) or path.startswith(NEVER_DOCS):
+        return False
+    return path.endswith((".md", ".txt")) or path.startswith("docs/") or path == "LICENSE"
+
+
+def changed_files(base: str) -> list[str] | None:
+    p = subprocess.run(
+        ["git", "diff", "--name-only", f"{base}...HEAD"], cwd=ROOT, capture_output=True, text=True
+    )
+    if p.returncode != 0:
+        print(p.stderr.strip() or f"git diff against {base} failed.")
+        return None
+    return [line for line in p.stdout.splitlines() if line]
+
+
+def cmd_pr_check(base: str) -> int:
+    """Docs-only PRs pass. Any other PR needs an approved, locked change folder."""
+    files = changed_files(base)
+    if files is None:
+        return 2
+    if not files:
+        print("No changed files.")
+        return 0
+    if all(is_docs_file(f) for f in files):
+        print(f"docs-only PR ({len(files)} file(s)): needs review, no change folder.")
+        return 0
+
+    other = [f for f in files if not is_docs_file(f) and not f.startswith("changes/")]
+    rules = [f for f in other if is_rule_file(f)]
+    names = sorted({f.split("/")[1] for f in files if f.startswith("changes/") and f.count("/") >= 2})
+    problems: list[str] = []
+    if not names:
+        what = ", ".join(rules[:3]) if rules else ", ".join(other[:3])
+        problems.append(f"this PR changes {what} but includes no change folder under changes/")
+    for name in names:
+        change = CHANGES / name
+        if not change.is_dir():
+            continue  # the change folder was deleted in this PR
+        status = spec_status(change)
+        if status not in ("approved", "done"):
+            problems.append(f"{name}: spec is {status or 'missing a status'}; a human must approve and lock it")
+        else:
+            problems.extend(check_change(change))
+    if problems:
+        print("PR check failed:")
+        print("\n".join(f"  ✗ {p}" for p in problems))
+        return 1
+    print(f"PR check passed: {len(files)} file(s), change(s): {', '.join(names)}.")
+    return 0
+
+
 def find_change(arg: str) -> Path | None:
     exact = CHANGES / arg
     if exact.is_dir():
@@ -168,6 +230,8 @@ def main(argv: list[str]) -> int:
         return cmd_check()
     if len(argv) == 1 and argv[0] == "test":
         return cmd_test()
+    if len(argv) == 2 and argv[0] == "pr-check":
+        return cmd_pr_check(argv[1])
     if len(argv) == 2 and argv[0] in ("lock", "new"):
         return cmd_lock(argv[1]) if argv[0] == "lock" else cmd_new(argv[1])
     print(__doc__)

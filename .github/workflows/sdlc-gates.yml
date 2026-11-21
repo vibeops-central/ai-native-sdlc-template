@@ -7,12 +7,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install pytest
       - name: Gates (intent, spec, plan, locked acceptance tests)
         run: python scripts/gate.py check
+      - name: Change class (docs-only, or an approved change)
+        if: github.event_name == 'pull_request'
+        run: python scripts/gate.py pr-check origin/${{ github.base_ref }}
       - name: Acceptance tests of approved changes
         run: python scripts/gate.py test
       - name: Other tests

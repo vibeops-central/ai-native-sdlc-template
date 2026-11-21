@@ -5,8 +5,11 @@ The author of a change (human or agent) cannot be its approver.
 
 ## Block the PR if any of these is true
 
-- [ ] There is no `intent.md` and approved `spec.md` for the change.
-- [ ] `python scripts/gate.py check` fails.
+- [ ] The class is wrong (see AGENTS.md). For example, a "docs-only" PR that changes a
+      rule file, or higher-risk work marked `Risk: routine`.
+- [ ] A routine or higher-risk change has no `intent.md` and approved `spec.md`.
+- [ ] `Risk: higher`, but no tech lead or second human approved it.
+- [ ] `python scripts/gate.py check` or `python scripts/gate.py pr-check` fails.
 - [ ] Approved acceptance tests or an `acceptance.lock` were changed without a human saying
       why in the PR.
 - [ ] The PR claims "done" without evidence (commands run and their output).
