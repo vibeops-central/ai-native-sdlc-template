@@ -1,5 +1,6 @@
 # Intent: 0001-greet
 
+Status: draft
 **Owner (human):** @ (whoever approves this example)
 **Date:** 2026-11-21
 

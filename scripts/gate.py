@@ -37,6 +37,7 @@ LOCK_NAME = "acceptance.lock"
 REQUIRED = ("intent.md", "spec.md")
 STATUSES = ("draft", "approved", "done")
 APPROVED = ("approved", "done")
+OWNER_RE = re.compile(r"^\**owner \(human\):\**\s*@[A-Za-z0-9]", re.IGNORECASE | re.MULTILINE)
 STATUS_RE = re.compile(r"^\s*\**status\**\s*:\s*\**\s*([a-z]+)", re.IGNORECASE | re.MULTILINE)
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
@@ -77,6 +78,20 @@ def spec_status(change: Path) -> str | None:
     return parse_status(spec.read_text(encoding="utf-8")) if spec.is_file() else None
 
 
+def intent_status(change: Path) -> str | None:
+    """The intent's status. No intent.md, or no 'Status:' line, means draft."""
+    intent = change / "intent.md"
+    if not intent.is_file():
+        return None
+    return parse_status(intent.read_text(encoding="utf-8")) or "draft"
+
+
+def has_owner(change: Path) -> bool:
+    """The intent names a human owner: 'Owner (human):' followed by an @handle."""
+    intent = change / "intent.md"
+    return intent.is_file() and OWNER_RE.search(intent.read_text(encoding="utf-8")) is not None
+
+
 def tests_hash(folder: Path) -> str:
     """One sha256 over every file's relative path and bytes (caches ignored)."""
     digest = hashlib.sha256()
@@ -109,6 +124,13 @@ def check_change(change: Path, warnings: list[str] | None = None) -> list[str]:
     if status not in APPROVED:
         return problems
 
+    if (change / "intent.md").is_file():
+        if intent_status(change) not in APPROVED:
+            problems.append(
+                f"{name}: spec is {status} but intent.md is not; a human must approve the intent too"
+            )
+        elif not has_owner(change):
+            problems.append(f"{name}: approved intent.md must name a human owner ('Owner (human): @handle')")
     if not (change / "plan.md").is_file():
         problems.append(f"{name}: spec is {status} but there is no plan.md")
     tests = ACCEPTANCE / name
@@ -249,14 +271,15 @@ def cmd_pr_check(base: str) -> int:
 
     other = [f for f in files if not is_docs_file(f) and not f.startswith("changes/")]
     rules = [f for f in other if is_rule_file(f)]
-    names = sorted({f.split("/")[1] for f in files if f.startswith("changes/") and f.count("/") >= 2})
+    touched = sorted({f.split("/")[1] for f in files if f.startswith("changes/") and f.count("/") >= 2})
+    names = [n for n in touched if (CHANGES / n).is_dir()]  # deleted folders don't count
     if not names:
-        what = ", ".join(rules[:3]) if rules else ", ".join(other[:3])
-        problems.append(f"this PR changes {what} but includes no change folder under changes/")
+        what = ", ".join(rules[:3]) if rules else ", ".join(other[:3]) or "a change folder"
+        problems.append(
+            f"this PR changes {what} but includes no change folder under changes/ (deleted folders don't count)"
+        )
     for name in names:
         change = CHANGES / name
-        if not change.is_dir():
-            continue  # the change folder was deleted in this PR
         status = spec_status(change)
         if status not in APPROVED:
             step = "approve and lock it" if lock_enabled() else "approve it"

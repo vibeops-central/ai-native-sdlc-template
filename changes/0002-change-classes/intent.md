@@ -1,5 +1,7 @@
 # Intent: 0002-change-classes
 
+Status: approved
+<!-- Recorded by change 0003: Natu approved 0002 on 21 Nov 2026, before intents had a status. -->
 **Owner (human):** @nlauchande (agreed in chat, 21 Nov 2026)
 **Date:** 2026-11-21
 

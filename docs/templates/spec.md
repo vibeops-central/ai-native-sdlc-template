@@ -2,7 +2,7 @@
 
 Status: draft
 Risk: routine
-<!-- draft -> approved (a human sets this; if sdlc.toml turns the lock on, they also run `python scripts/gate.py lock {{change}}`) -> done -->
+<!-- draft -> approved (a human sets this here AND in intent.md; if sdlc.toml turns the lock on, they also run `python scripts/gate.py lock {{change}}`) -> done -->
 <!-- Risk: routine (the engineer approves) or higher (a tech lead approves). See AGENTS.md. -->
 
 ## Behaviour

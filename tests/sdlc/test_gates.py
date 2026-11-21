@@ -51,7 +51,12 @@ def new_change(repo, slug="greet", test="def test_ok():\n    assert True\n"):
 
 
 def approve(repo, name):
-    spec = repo / "changes" / name / "spec.md"
+    """Approve the intent and the spec, as a human would (change 0003)."""
+    folder = repo / "changes" / name
+    intent = folder / "intent.md"
+    intent.write_text(intent.read_text().replace("Status: draft", "Status: approved", 1)
+                      .replace("**Owner (human):** @", "**Owner (human):** @owner", 1))
+    spec = folder / "spec.md"
     spec.write_text(spec.read_text().replace("Status: draft", "Status: approved"))
 
 

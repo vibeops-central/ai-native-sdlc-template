@@ -7,7 +7,10 @@ The author of a change (human or agent) cannot be its approver.
 
 - [ ] The class is wrong (see AGENTS.md). For example, a "docs-only" PR that changes a
       rule file, or higher-risk work marked `Risk: routine`.
-- [ ] A routine or higher-risk change has no `intent.md` and approved `spec.md`.
+- [ ] A routine or higher-risk change has no approved `intent.md` and approved `spec.md`, or
+      the intent names no human owner.
+- [ ] The intent doesn't say what the owner actually asked for (agents draft intents; check
+      it against the request).
 - [ ] `Risk: higher`, but no tech lead or second human approved it.
 - [ ] `python scripts/gate.py check` or `python scripts/gate.py pr-check` fails.
 - [ ] Approved acceptance tests or an `acceptance.lock` were changed without a human saying
