@@ -1,6 +1,6 @@
 # Spec: 0003-pr-check-gaps
 
-Status: draft
+Status: approved
 Risk: higher
 <!-- draft -> approved (a human sets this, together with Status: approved in intent.md) -> done -->
 <!-- Risk is higher because this changes the gate tooling and the templates. -->
