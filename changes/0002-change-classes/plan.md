@@ -11,10 +11,16 @@ Keep this true. If the work drifts from the plan, update it in the same commit.
 4. Update the first block rule in `REVIEW.md` and add a class check.
 5. Run `pr-check` in CI on pull requests (`fetch-depth: 0` so the base branch exists).
 6. Mention the classes in the README table of what is enforced.
+7. (Added 21 Nov) Add `sdlc.toml` with `acceptance_lock = false`. Make `gate.py check`,
+   `pr-check` and `lock`, and the Claude Code hook, follow it: warn and log when off,
+   block when on. Treat `sdlc.toml` as a rule file.
+8. (Added 21 Nov) Tests for both modes in `tests/sdlc/` and in this change's acceptance
+   tests. README: the default is the playbook as written; the lock is a VibeOps experiment.
 
 ## Files touched
-- `scripts/gate.py`
-- `docs/templates/spec.md`
+- `scripts/gate.py`, `.claude/hooks/protect_acceptance.py`, `sdlc.toml` (new)
+- `docs/templates/spec.md`, `.github/CODEOWNERS`
+- `tests/sdlc/test_gates.py`
 - `AGENTS.md`, `REVIEW.md`, `README.md`
 - `.github/workflows/sdlc-gates.yml`
 

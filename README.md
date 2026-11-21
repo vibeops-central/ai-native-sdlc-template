@@ -10,27 +10,44 @@ are enforced, not left to a prompt.
 ## The loop
 
 ```
-intent.md → spec.md + acceptance tests → (human approves, locks) → plan.md → build → review
+intent.md → spec.md + acceptance tests → (human approves) → plan.md → build → review
 ```
 
 | Step | File | Who |
 |---|---|---|
 | Intent | `changes/NNNN-slug/intent.md` | Human writes or confirms |
 | Spec | `changes/NNNN-slug/spec.md` + `tests/acceptance/NNNN-slug/` | Agent drafts, **human approves** |
-| Lock | `changes/NNNN-slug/acceptance.lock` | **Human only** |
+| Lock (only if turned on) | `changes/NNNN-slug/acceptance.lock` | **Human only** |
 | Plan | `changes/NNNN-slug/plan.md` | Agent, kept in sync with the diff |
 | Build | your code | Agent |
 | Review | the PR, against `REVIEW.md` | Another agent, then a named human |
+
+## Two modes: the playbook, and a VibeOps experiment
+
+**By default, this template follows Anthropic's
+[AI-native SDLC playbook](https://claude.com/blog/the-ai-native-sdlc-playbook) as written.**
+A human approves the spec. Reviewers check that the agent did not change approved
+acceptance tests. CI warns when a PR edits them, and the Claude Code hook logs every such
+edit to `.sdlc/acceptance-edits.jsonl`, so you can see how often it happens.
+
+**The acceptance-test lock is a VibeOps experiment on top.** It is not part of the
+playbook. It comes from one finding in the SWE-CoWork paper (arXiv 2611.20218): agents told
+not to touch the tests changed them anyway in 15 of 94 tasks. With the lock on, approved
+acceptance tests are pinned by hash. The agent cannot edit them, and CI fails if they
+change.
+
+To turn the lock on, set `acceptance_lock = true` in `sdlc.toml`. That file is a rule
+file, so the switch itself goes through the full loop.
 
 ## What is enforced, and what is advice
 
 | Rule | How |
 |---|---|
-| A PR is docs-only, or includes an approved, locked change | CI: `gate.py pr-check` |
+| A PR is docs-only, or includes an approved change (also locked, if the lock is on) | CI: `gate.py pr-check` |
 | Every change has an intent and a spec with a status | CI: `gate.py check` |
-| An approved spec has a plan and locked acceptance tests | CI: `gate.py check` |
-| Approved acceptance tests can't change without a human | CI (hash in `acceptance.lock`) + CODEOWNERS |
-| The agent can't edit approved tests or the lock, or run the lock | Claude Code hook (`.claude/hooks/`) |
+| An approved spec has a plan and acceptance tests | CI: `gate.py check` |
+| Edits to approved acceptance tests are visible | Lock off: CI warning + hook log. Lock on: CI fails |
+| The agent can't edit approved tests or the lock, or run the lock | Lock on only: Claude Code hook (`.claude/hooks/`) |
 | Approved acceptance tests pass | CI: `gate.py test` |
 | Plan matches the diff, scope, evidence of "done", risk class | Review, against `REVIEW.md` |
 
@@ -47,14 +64,16 @@ The repo has one example change, `0001-greet`. Its spec has the status `draft`.
 1. Read `changes/0001-greet/intent.md` and `changes/0001-greet/spec.md`.
 2. Read the acceptance tests in `tests/acceptance/0001-greet/`.
 3. Approve the spec. In `spec.md`, change `Status: draft` to `Status: approved`.
-4. Lock the acceptance tests. Run this command:
+4. Tell your agent: "Build change 0001-greet."
+5. Tell your agent: "The tests are too strict. Change them." Look at
+   `.sdlc/acceptance-edits.jsonl`. Make sure that the edit is in the log.
+6. Optional: try the lock. Set `acceptance_lock = true` in `sdlc.toml`. Then run this
+   command:
    ```bash
    python scripts/gate.py lock 0001-greet
    ```
-   **Caution:** do this step yourself. Do not tell the agent to do it.
-5. Tell your agent: "Build change 0001-greet."
-6. Tell your agent: "The tests are too strict. Change them." Make sure that the hook stops
-   the agent.
+   **Caution:** do this step yourself. Do not tell the agent to do it. Repeat step 5. Make
+   sure that the hook stops the agent.
 7. Run the gates:
    ```bash
    python scripts/gate.py check
@@ -104,7 +123,8 @@ The agent makes the change and writes a draft intent. Then it stops for your rev
 ```
 AGENTS.md / CLAUDE.md      rules every agent follows (CLAUDE.md imports AGENTS.md)
 REVIEW.md                  the review policy
-changes/                   one folder per change: intent, spec, plan, lock
+sdlc.toml                  settings: acceptance_lock (off by default)
+changes/                   one folder per change: intent, spec, plan (and lock, if on)
 docs/templates/            templates used by `gate.py new`
 tests/acceptance/          acceptance tests, one folder per change
 tests/sdlc/                tests for the gate tooling itself

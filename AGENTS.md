@@ -12,7 +12,8 @@ Every change goes through five steps, as files in `changes/<NNNN-slug>/`:
    confirmed by a human. Never start without one.
 2. **Spec** (`spec.md`): behaviour, edge cases, and the acceptance tests in
    `tests/acceptance/<NNNN-slug>/`. You may draft both. **Stop here** and ask a human to
-   review. The human sets `Status: approved` and runs `python scripts/gate.py lock <change>`.
+   review. The human sets `Status: approved` (and, if the acceptance lock is on, runs
+   `python scripts/gate.py lock <change>`).
 3. **Plan** (`plan.md`): the files you will touch and the order, small steps. Keep it true:
    if the work drifts from the plan, update the plan in the same commit.
 4. **Build**: make the acceptance tests pass. Add any other tests you like.
@@ -36,10 +37,19 @@ classes. CI checks the first two (`gate.py pr-check`); reviewers check the third
 `scripts/`, `docs/templates/`. They change how agents and gates behave, so they get the full
 loop. If you are unsure of the class, use the stricter one.
 
+## Acceptance-test lock (`sdlc.toml`)
+
+- **Off (default):** Anthropic's playbook as written. Reviewers check that approved
+  acceptance tests were not changed. CI warns about such edits, and the Claude Code hook logs
+  them to `.sdlc/acceptance-edits.jsonl`.
+- **On:** the VibeOps experiment. Approved acceptance tests are pinned by hash. The hook
+  blocks edits to them, and CI fails if they change.
+
 ## Hard rules
 
 - **Never edit approved acceptance tests** or any `acceptance.lock`, and never run
-  `gate.py lock`. A hook blocks this; CI fails it. If a test looks wrong, say so and stop.
+  `gate.py lock`, in either mode. With the lock off, every such edit is logged and flagged
+  for review; with it on, it is blocked. If a test looks wrong, say so and stop.
 - **"Done" needs evidence.** Report the commands you ran and their output, not a summary of
   what you believe happened.
 - **No new dependencies, network calls or secrets** without saying so in the PR, with a

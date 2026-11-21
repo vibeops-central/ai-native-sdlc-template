@@ -1,0 +1,8 @@
+# SDLC settings. This file is a rule file: changing it needs the full loop (see AGENTS.md).
+
+# false (default): Anthropic's AI-native SDLC playbook as written. A human approves the spec,
+#   and reviewers check that approved acceptance tests were not changed. CI warns about such
+#   edits and the Claude Code hook logs them to .sdlc/acceptance-edits.jsonl.
+# true: the VibeOps experiment. Approved acceptance tests are pinned by hash with
+#   `gate.py lock`; editing them fails CI and the hook blocks the agent.
+acceptance_lock = false

@@ -11,7 +11,8 @@ The author of a change (human or agent) cannot be its approver.
 - [ ] `Risk: higher`, but no tech lead or second human approved it.
 - [ ] `python scripts/gate.py check` or `python scripts/gate.py pr-check` fails.
 - [ ] Approved acceptance tests or an `acceptance.lock` were changed without a human saying
-      why in the PR.
+      why in the PR. With the lock off, CI shows these as warnings ("already approved") and
+      the agent's edits are logged in `.sdlc/acceptance-edits.jsonl`: read both.
 - [ ] The PR claims "done" without evidence (commands run and their output).
 - [ ] A new dependency, network call, secret or permission appears without a reason.
 
