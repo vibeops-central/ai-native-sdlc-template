@@ -1,6 +1,6 @@
 # Intent: 0003-pr-check-gaps
 
-Status: draft
+Status: approved
 **Owner (human):** @nlauchande (asked for in chat, 21 Nov 2026; drafted by the agent)
 **Date:** 2026-11-21
 
