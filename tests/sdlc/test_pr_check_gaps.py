@@ -1,4 +1,4 @@
-"""Acceptance tests for change 0003: deleted change folders and intent approval."""
+"""Tests for `gate.py pr-check`: deleted change folders and intent approval."""
 
 import os
 import shutil
@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-REPO = Path(__file__).resolve().parents[3]
+REPO = Path(__file__).resolve().parents[2]
 GIT_ENV = {
     **os.environ,
     "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.com",

@@ -1,4 +1,4 @@
-"""Acceptance tests for `gate.py pr-check`, run in a throwaway git repo, in both modes."""
+"""Tests for `gate.py pr-check` change classes, run in a throwaway git repo, in both modes."""
 
 import os
 import shutil
@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-REPO = Path(__file__).resolve().parents[3]
+REPO = Path(__file__).resolve().parents[2]
 GIT_ENV = {
     **os.environ,
     "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.com",
@@ -61,7 +61,7 @@ def add_change(repo, approve=False, lock=False):
     name = "0001-thing"
     (repo / "tests" / "acceptance" / name / "test_it.py").write_text("def test_ok():\n    assert True\n")
     if approve:
-        # Change 0003: approving a change means approving its intent (with an owner) too.
+        # Approving a change means approving its intent (with an owner) too.
         intent = repo / "changes" / name / "intent.md"
         intent.write_text(intent.read_text().replace("Status: draft", "Status: approved", 1)
                           .replace("**Owner (human):** @", "**Owner (human):** @owner", 1))
