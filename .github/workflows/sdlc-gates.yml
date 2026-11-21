@@ -1,0 +1,19 @@
+name: SDLC gates
+
+on: [push, pull_request]
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pytest
+      - name: Gates (intent, spec, plan, locked acceptance tests)
+        run: python scripts/gate.py check
+      - name: Acceptance tests of approved changes
+        run: python scripts/gate.py test
+      - name: Other tests
+        run: python -m pytest

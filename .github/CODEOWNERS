@@ -1,0 +1,11 @@
+# A human must approve changes to the answer key and to the rules agents follow.
+# Replace @nlauchande with your own user or team when you use this template, and turn on
+# "Require review from Code Owners" in the branch protection rules for main.
+
+**/acceptance.lock   @nlauchande
+/tests/acceptance/   @nlauchande
+/AGENTS.md           @nlauchande
+/CLAUDE.md           @nlauchande
+/REVIEW.md           @nlauchande
+/.claude/            @nlauchande
+/scripts/gate.py     @nlauchande

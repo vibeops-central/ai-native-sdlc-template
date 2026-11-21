@@ -1,0 +1,13 @@
+[project]
+name = "ai-native-sdlc-template"
+version = "0.1.0"
+description = "A minimal AI-native SDLC: intent, spec, plan, build, review, with gates"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests/sdlc"]
