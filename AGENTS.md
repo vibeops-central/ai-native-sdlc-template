@@ -33,15 +33,17 @@ classes. CI checks the first two (`gate.py pr-check`); reviewers check the third
 | **Routine** | Any other change | The full loop above | The engineer |
 | **Higher risk** | Auth, payments, personal data, money movement, the gate tooling, the agent's rules | The full loop, with `Risk: higher` in the spec | A tech lead or second human |
 
-**These are never docs:** `AGENTS.md`, `CLAUDE.md`, `REVIEW.md`, `.claude/`, `.github/`,
-`scripts/`, `docs/templates/`. They change how agents and gates behave, so they get the full
-loop. If you are unsure of the class, use the stricter one.
+**These are never docs:** `AGENTS.md`, `CLAUDE.md`, `REVIEW.md`, `sdlc.toml`, `.claude/`,
+`.github/`, `scripts/`, `docs/templates/`, `evals/`. They change how agents and gates
+behave, or decide whether an agent passes, so they get the full loop. If you are unsure of
+the class, use the stricter one.
 
 ## Acceptance-test lock (`sdlc.toml`)
 
 - **Off (default):** Anthropic's playbook as written. Reviewers check that approved
   acceptance tests were not changed. CI warns about such edits, and the Claude Code hook logs
-  them to `.sdlc/acceptance-edits.jsonl`.
+  them to `.sdlc/acceptance-edits.jsonl`. **Commit that log with your change**; CI repeats
+  every new entry as a warning on the PR.
 - **On:** the VibeOps experiment. Approved acceptance tests are pinned by hash. The hook
   blocks edits to them, and CI fails if they change.
 
@@ -50,6 +52,8 @@ loop. If you are unsure of the class, use the stricter one.
 - **Never edit approved acceptance tests** or any `acceptance.lock`, and never run
   `gate.py lock`, in either mode. With the lock off, every such edit is logged and flagged
   for review; with it on, it is blocked. If a test looks wrong, say so and stop.
+- **The edit log is append-only.** Never edit, shorten or delete
+  `.sdlc/acceptance-edits.jsonl`. CI flags removed lines.
 - **"Done" needs evidence.** Report the commands you ran and their output, not a summary of
   what you believe happened.
 - **No new dependencies, network calls or secrets** without saying so in the PR, with a

@@ -107,6 +107,16 @@ def test_settings_file_is_a_rule_file(mode, request):
 
 
 @pytest.mark.parametrize("mode", ["repo", "locked"])
+def test_evals_are_rule_files(mode, request):
+    r = request.getfixturevalue(mode)
+    (r / "evals").mkdir()
+    (r / "evals" / "case.md").write_text("# Case\n")
+    commit(r)
+    code, out = pr_check(r)
+    assert code == 1 and "evals/case.md" in out and "docs-only" not in out
+
+
+@pytest.mark.parametrize("mode", ["repo", "locked"])
 def test_code_needs_a_change(mode, request):
     r = request.getfixturevalue(mode)
     (r / "src" / "app.py").write_text("x = 2\n")
@@ -195,3 +205,45 @@ def test_on_editing_approved_tests_fails(locked):
     commit(locked)
     code, out = pr_check(locked)
     assert code == 1 and "already approved" in out
+
+
+# --- the edit log (committed, append-only) ----------------------------------------------
+
+LOG = ".sdlc/acceptance-edits.jsonl"
+
+
+def write_log(repo, lines):
+    path = repo / LOG
+    path.parent.mkdir(exist_ok=True)
+    path.write_text("".join(line + "\n" for line in lines))
+
+
+def test_edit_log_entries_are_repeated_as_warnings(repo):
+    name = merge_approved_change(repo, lock=False)
+    (repo / "tests" / "acceptance" / name / "test_it.py").write_text("def test_ok():\n    pass\n")
+    plan = repo / "changes" / name / "plan.md"
+    plan.write_text(plan.read_text() + "\nTests adjusted.\n")
+    write_log(repo, ['{"tool": "Edit", "change": "0001-thing", "kind": "approved-test"}'])
+    commit(repo)
+    code, out = pr_check(repo)
+    assert code == 0
+    assert "logged in .sdlc/acceptance-edits.jsonl" in out and '"tool": "Edit"' in out
+
+
+def test_removing_edit_log_lines_warns(repo):
+    sh(repo, "git", "checkout", "-q", "main")
+    write_log(repo, ['{"entry": 1}', '{"entry": 2}'])
+    commit(repo)
+    sh(repo, "git", "checkout", "-q", "-b", "pr2")
+    write_log(repo, ['{"entry": 1}'])
+    add_change(repo, approve=True)
+    commit(repo)
+    code, out = pr_check(repo)
+    assert "removed from .sdlc/acceptance-edits.jsonl" in out and "append-only" in out
+
+
+def test_edit_log_is_not_docs(repo):
+    write_log(repo, ['{"entry": 1}'])
+    commit(repo)
+    code, out = pr_check(repo)
+    assert code == 1 and "docs-only" not in out

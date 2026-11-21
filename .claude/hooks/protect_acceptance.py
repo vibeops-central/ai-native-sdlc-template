@@ -4,7 +4,8 @@
 The behaviour depends on `acceptance_lock` in sdlc.toml:
 
 - Off (default, Anthropic's playbook as written): edits to the acceptance tests of an
-  approved change are allowed, and logged to .sdlc/acceptance-edits.jsonl for the reviewer.
+  approved change are allowed, and logged to .sdlc/acceptance-edits.jsonl. The log is
+  committed with the PR, so the reviewer sees it in the diff and CI repeats each entry.
 - On (VibeOps experiment): such edits are blocked (exit 2, the reason is shown to the agent),
   and so are edits to any acceptance.lock and running `gate.py lock`.
 
@@ -104,7 +105,11 @@ def main() -> int:
         return 2
     if kind == "approved-test":
         log(tool, target, kind, change)
-        print(f"Note: logged an edit to approved acceptance tests ({change}) for the reviewer.", file=sys.stderr)
+        print(
+            f"Note: logged an edit to approved acceptance tests ({change}) in .sdlc/acceptance-edits.jsonl. "
+            "Commit that file with your change.",
+            file=sys.stderr,
+        )
     return 0
 
 

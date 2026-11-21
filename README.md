@@ -28,7 +28,8 @@ intent.md → spec.md + acceptance tests → (human approves) → plan.md → bu
 [AI-native SDLC playbook](https://claude.com/blog/the-ai-native-sdlc-playbook) as written.**
 A human approves the spec. Reviewers check that the agent did not change approved
 acceptance tests. CI warns when a PR edits them, and the Claude Code hook logs every such
-edit to `.sdlc/acceptance-edits.jsonl`, so you can see how often it happens.
+edit to `.sdlc/acceptance-edits.jsonl`. That log is committed with each PR, so the reviewer
+sees it in the diff and you build up a record of how often it happens.
 
 **The acceptance-test lock is a VibeOps experiment on top.** It is not part of the
 playbook. It comes from one finding in the SWE-CoWork paper (arXiv 2611.20218): agents told
@@ -124,11 +125,12 @@ The agent makes the change and writes a draft intent. Then it stops for your rev
 AGENTS.md / CLAUDE.md      rules every agent follows (CLAUDE.md imports AGENTS.md)
 REVIEW.md                  the review policy
 sdlc.toml                  settings: acceptance_lock (off by default)
+.sdlc/acceptance-edits.jsonl  log of agent edits to approved tests (committed, append-only)
 changes/                   one folder per change: intent, spec, plan (and lock, if on)
 docs/templates/            templates used by `gate.py new`
 tests/acceptance/          acceptance tests, one folder per change
 tests/sdlc/                tests for the gate tooling itself
-evals/                     cases to re-run when rules, skills or hooks change
+evals/                     cases to re-run when rules, skills or hooks change (rule files)
 scripts/gate.py            the gates (standard library only)
 .claude/                   hook and slash command for Claude Code
 .github/                   CI, CODEOWNERS, PR template

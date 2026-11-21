@@ -16,11 +16,14 @@ Keep this true. If the work drifts from the plan, update it in the same commit.
    block when on. Treat `sdlc.toml` as a rule file.
 8. (Added 21 Nov) Tests for both modes in `tests/sdlc/` and in this change's acceptance
    tests. README: the default is the playbook as written; the lock is a VibeOps experiment.
+9. (Added 21 Nov) `evals/` becomes a rule directory. The edit log is committed and
+   append-only: `pr-check` repeats new entries as warnings and warns on removed lines.
 
 ## Files touched
 - `scripts/gate.py`, `.claude/hooks/protect_acceptance.py`, `sdlc.toml` (new)
 - `docs/templates/spec.md`, `.github/CODEOWNERS`
 - `tests/sdlc/test_gates.py`
+- `evals/README.md`
 - `AGENTS.md`, `REVIEW.md`, `README.md`
 - `.github/workflows/sdlc-gates.yml`
 

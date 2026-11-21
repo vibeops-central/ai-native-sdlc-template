@@ -41,8 +41,9 @@ STATUS_RE = re.compile(r"^\s*\**status\**\s*:\s*\**\s*([a-z]+)", re.IGNORECASE |
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
 RULE_FILES = {"AGENTS.md", "CLAUDE.md", "REVIEW.md", "sdlc.toml"}
-RULE_DIRS = (".claude/", ".github/", "scripts/", "docs/templates/")
-NEVER_DOCS = ("changes/", "tests/")
+RULE_DIRS = (".claude/", ".github/", "scripts/", "docs/templates/", "evals/")
+NEVER_DOCS = ("changes/", "tests/", ".sdlc/")
+EDIT_LOG = ".sdlc/acceptance-edits.jsonl"
 
 
 # --- settings ---------------------------------------------------------------------------
@@ -196,6 +197,18 @@ def status_at(base: str, name: str) -> str | None:
     return parse_status(p.stdout) if p.returncode == 0 else None
 
 
+def edit_log_changes(base: str) -> tuple[list[str], int]:
+    """Lines this PR added to the edit log, and how many it removed."""
+    p = git("diff", "--unified=0", f"{base}...HEAD", "--", EDIT_LOG)
+    added, removed = [], 0
+    for line in p.stdout.splitlines():
+        if line.startswith("+") and not line.startswith("+++"):
+            added.append(line[1:])
+        elif line.startswith("-") and not line.startswith("---"):
+            removed += 1
+    return added, removed
+
+
 def cmd_pr_check(base: str) -> int:
     """Docs-only PRs pass. Any other PR needs an approved change folder."""
     files = changed_files(base)
@@ -221,6 +234,14 @@ def cmd_pr_check(base: str) -> int:
             problems.append(message + ". A human must review and lock again.")
         else:
             warnings.append(message + ". Reviewer: confirm a human agreed (see REVIEW.md).")
+
+    # The hook's log of agent edits to approved acceptance tests (committed with the PR).
+    if EDIT_LOG in files:
+        added, removed = edit_log_changes(base)
+        for entry in added:
+            warnings.append(f"agent edit to approved acceptance tests logged in {EDIT_LOG}: {entry}")
+        if removed:
+            warnings.append(f"{removed} line(s) were removed from {EDIT_LOG}. The log is append-only.")
 
     if not problems and all(is_docs_file(f) for f in files):
         print(f"docs-only PR ({len(files)} file(s)): needs review, no change folder.")
