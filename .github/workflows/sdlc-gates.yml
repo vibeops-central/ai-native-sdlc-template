@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install pytest
-      - name: Gates (intent, spec, plan, locked acceptance tests)
+      - name: Gates (intent, spec, plan, acceptance tests; lock if on)
         run: python scripts/gate.py check
       - name: Change class (docs-only, or an approved change)
         if: github.event_name == 'pull_request'
