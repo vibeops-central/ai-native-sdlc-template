@@ -5,10 +5,16 @@ The author of a change (human or agent) cannot be its approver.
 
 ## Block the PR if any of these is true
 
-- [ ] There is no `intent.md` and approved `spec.md` for the change.
-- [ ] `python scripts/gate.py check` fails.
+- [ ] The class is wrong (see AGENTS.md). For example, a "docs-only" PR that changes a
+      rule file, or higher-risk work marked `Risk: routine`.
+- [ ] A routine or higher-risk change has no `intent.md` and approved `spec.md`.
+- [ ] `Risk: higher`, but no tech lead or second human approved it.
+- [ ] `python scripts/gate.py check` or `python scripts/gate.py pr-check` fails.
 - [ ] Approved acceptance tests or an `acceptance.lock` were changed without a human saying
-      why in the PR.
+      why in the PR. With the lock off, CI shows these as warnings ("already approved"), and
+      each new line in `.sdlc/acceptance-edits.jsonl` is repeated as a warning: read both.
+- [ ] Lines were removed from `.sdlc/acceptance-edits.jsonl` (the log is append-only).
+- [ ] An eval in `evals/` was changed to make an agent pass more easily, without a reason.
 - [ ] The PR claims "done" without evidence (commands run and their output).
 - [ ] A new dependency, network call, secret or permission appears without a reason.
 

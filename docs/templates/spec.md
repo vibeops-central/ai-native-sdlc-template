@@ -1,7 +1,9 @@
 # Spec: {{change}}
 
 Status: draft
-<!-- draft -> approved (a human sets this, then runs `python scripts/gate.py lock {{change}}`) -> done -->
+Risk: routine
+<!-- draft -> approved (a human sets this; if sdlc.toml turns the lock on, they also run `python scripts/gate.py lock {{change}}`) -> done -->
+<!-- Risk: routine (the engineer approves) or higher (a tech lead approves). See AGENTS.md. -->
 
 ## Behaviour
 What the system does, step by step, from the outside.
