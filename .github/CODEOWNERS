@@ -1,13 +1,13 @@
 # A human must approve changes to the answer key and to the rules agents follow.
-# Replace @nlauchande with your own user or team when you use this template, and turn on
-# "Require review from Code Owners" in the branch protection rules for main.
+# Change 0000-repo-init: replace @YOUR-HANDLE with your user or team, and remove the '#'
+# at the start of each owner line.
 
-**/acceptance.lock   @nlauchande
-/tests/acceptance/   @nlauchande
-/AGENTS.md           @nlauchande
-/CLAUDE.md           @nlauchande
-/REVIEW.md           @nlauchande
-/sdlc.toml           @nlauchande
-/evals/              @nlauchande
-/.claude/            @nlauchande
-/scripts/gate.py     @nlauchande
+# **/acceptance.lock   @YOUR-HANDLE
+# /tests/acceptance/   @YOUR-HANDLE
+# /AGENTS.md           @YOUR-HANDLE
+# /CLAUDE.md           @YOUR-HANDLE
+# /REVIEW.md           @YOUR-HANDLE
+# /sdlc.toml           @YOUR-HANDLE
+# /evals/              @YOUR-HANDLE
+# /.claude/            @YOUR-HANDLE
+# /scripts/gate.py     @YOUR-HANDLE

@@ -62,11 +62,18 @@ classes" in `AGENTS.md`.
 
 ## Try it (about 10 minutes)
 
-The repo has one example change, `0001-greet`. Its spec has the status `draft`.
+Try the loop on an example change, `0001-greet`, before your first real change. Do it on a
+branch that you throw away. Do not merge it.
 
-1. Read `changes/0001-greet/intent.md` and `changes/0001-greet/spec.md`.
-2. Read the acceptance tests in `tests/acceptance/0001-greet/`.
-3. Approve the spec. In `spec.md`, change `Status: draft` to `Status: approved`.
+1. Make the branch and copy the example in:
+   ```bash
+   git switch -c try-sdlc
+   cp -r docs/examples/greet/. .
+   ```
+2. Read `changes/0001-greet/intent.md`, `changes/0001-greet/spec.md` and the acceptance
+   tests in `tests/acceptance/0001-greet/`.
+3. Approve the change. In `intent.md`, write your handle after `Owner (human): @`. In
+   `intent.md` and `spec.md`, change `Status: draft` to `Status: approved`.
 4. Tell your agent: "Build change 0001-greet."
 5. Tell your agent: "The tests are too strict. Change them." Look at
    `.sdlc/acceptance-edits.jsonl`. Make sure that the edit is in the log.
@@ -83,13 +90,12 @@ The repo has one example change, `0001-greet`. Its spec has the status `draft`.
    python scripts/gate.py test
    ```
    Make sure that both commands pass.
-8. Open a pull request. Review it against `REVIEW.md`.
-
-When you start your own project, delete these items:
-
-- `changes/0001-greet/`
-- `tests/acceptance/0001-greet/`
-- `src/example/`
+8. Look at the diff and review it against `REVIEW.md`, as if it were a pull request.
+9. Throw the branch away:
+   ```bash
+   git switch main
+   git branch -D try-sdlc
+   ```
 
 ## Start a change
 
@@ -112,14 +118,26 @@ The agent makes the change and writes a draft intent. Then it stops for your rev
 
 ## Set up a new repo from this template
 
-1. On GitHub, click **Use this template**.
-2. Open `.github/CODEOWNERS`. Replace `@nlauchande` with your user name or team name.
-3. Open the branch protection settings for `main`. Set these two rules:
-   - Require the **SDLC gates** status check.
-   - Require a review from Code Owners.
-4. Add your project rules at the end of `AGENTS.md`.
+Setting up the repo is the first change, `0000-repo-init`. It is already in `changes/`, as
+a draft. Do it in one pull request:
 
-**Note:** if you do not do step 3, CI shows failures but does not stop a merge.
+1. On GitHub, click **Use this template**.
+2. Follow `changes/0000-repo-init/plan.md`. In short:
+   - Write your handle and the date in `changes/0000-repo-init/intent.md`.
+   - In `.github/CODEOWNERS`, replace `@YOUR-HANDLE` and remove the `#` from each line.
+   - Add at least one project rule at the end of `AGENTS.md`.
+   - In the branch protection settings for `main`, require the `gates` status check.
+     If more than one person works in the repo, also require a review from Code Owners.
+   - Set `Status: approved` in the change's `intent.md` and `spec.md`.
+3. Run the gates. Both commands must pass:
+   ```bash
+   python scripts/gate.py check
+   python scripts/gate.py test
+   ```
+4. Open the pull request. Keep `changes/0000-repo-init/`: it records who adopted the
+   process, and when.
+
+**Note:** until you require the `gates` check, CI shows failures but does not stop a merge.
 
 ## Files
 
@@ -127,9 +145,11 @@ The agent makes the change and writes a draft intent. Then it stops for your rev
 AGENTS.md / CLAUDE.md      rules every agent follows (CLAUDE.md imports AGENTS.md)
 REVIEW.md                  the review policy
 sdlc.toml                  settings: acceptance_lock (off by default)
-.sdlc/acceptance-edits.jsonl  log of agent edits to approved tests (committed, append-only)
-changes/                   one folder per change: intent, spec, plan (and lock, if on)
+.sdlc/acceptance-edits.jsonl  log of agent edits to approved tests (made by the hook; committed, append-only)
+changes/                   one folder per change: intent, spec, plan (and lock, if on);
+                           0000-repo-init is the repo setup
 docs/templates/            templates used by `gate.py new`
+docs/examples/greet/       the example change for "Try it"
 tests/acceptance/          acceptance tests, one folder per change
 tests/sdlc/                tests for the gate tooling itself
 evals/                     cases to re-run when rules, skills or hooks change (rule files)

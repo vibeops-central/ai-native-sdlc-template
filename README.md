@@ -2,7 +2,8 @@
 
 > **Made from the [AI-native SDLC template](https://github.com/vibeops-central/ai-native-sdlc-template).**
 > To set up your repo, follow
-> [Set up a new repo from this template](docs/sdlc.md#set-up-a-new-repo-from-this-template).
+> [Set up a new repo from this template](docs/sdlc.md#set-up-a-new-repo-from-this-template)
+> (the setup is change `0000-repo-init`).
 > To see the process work, follow [Try it](docs/sdlc.md#try-it-about-10-minutes).
 > Then delete this note and write your project's README below.
 
