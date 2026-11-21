@@ -38,41 +38,62 @@ a sandbox. CI is the gate that counts.
 
 ## Try it (about 10 minutes)
 
-The repo ships one worked example, `0001-greet`, waiting for approval.
+The repo has one example change, `0001-greet`. Its spec has the status `draft`.
 
-1. **Read the intent and spec** in `changes/0001-greet/`, and the drafted acceptance tests in
-   `tests/acceptance/0001-greet/`.
-2. **Approve it** (you, the human): set `Status: approved` in `spec.md`, then run
+1. Read `changes/0001-greet/intent.md` and `changes/0001-greet/spec.md`.
+2. Read the acceptance tests in `tests/acceptance/0001-greet/`.
+3. Approve the spec. In `spec.md`, change `Status: draft` to `Status: approved`.
+4. Lock the acceptance tests. Run this command:
    ```bash
    python scripts/gate.py lock 0001-greet
    ```
-3. **Ask your agent to build it**: "Build change 0001-greet." Then try "the tests are too
-   strict, loosen them". The hook should refuse.
-4. **Check the gates**:
+   **Caution:** do this step yourself. Do not tell the agent to do it.
+5. Tell your agent: "Build change 0001-greet."
+6. Tell your agent: "The tests are too strict. Change them." Make sure that the hook stops
+   the agent.
+7. Run the gates:
    ```bash
    python scripts/gate.py check
    python scripts/gate.py test
    ```
-5. **Open a PR** and review it against `REVIEW.md`.
+   Make sure that both commands pass.
+8. Open a pull request. Review it against `REVIEW.md`.
 
-When you start your own project, delete `changes/0001-greet/`, `tests/acceptance/0001-greet/`
-and `src/example/`.
+When you start your own project, delete these items:
+
+- `changes/0001-greet/`
+- `tests/acceptance/0001-greet/`
+- `src/example/`
 
 ## Start a change
 
-```bash
-python scripts/gate.py new export-csv
+1. Choose a short name for the change. Use lowercase letters, numbers and hyphens. For
+   example: `export-csv`.
+2. Run this command:
+   ```bash
+   python scripts/gate.py new export-csv
+   ```
+   The command makes `changes/0002-export-csv/` and `tests/acceptance/0002-export-csv/`.
+3. Write the intent in `intent.md`.
+
+In Claude Code, you can use this command instead:
+
+```
+/new-change export-csv let users download their invoices as CSV
 ```
 
-In Claude Code: `/new-change export-csv let users download their invoices as CSV`.
+The agent makes the change and writes a draft intent. Then it stops for your review.
 
 ## Set up a new repo from this template
 
-1. **Use this template** on GitHub.
-2. Replace `@nlauchande` in `.github/CODEOWNERS` with your user or team.
-3. In branch protection for `main`: require the **SDLC gates** check and **review from Code
-   Owners**.
-4. Add your own rules at the bottom of `AGENTS.md`.
+1. On GitHub, click **Use this template**.
+2. Open `.github/CODEOWNERS`. Replace `@nlauchande` with your user name or team name.
+3. Open the branch protection settings for `main`. Set these two rules:
+   - Require the **SDLC gates** status check.
+   - Require a review from Code Owners.
+4. Add your project rules at the end of `AGENTS.md`.
+
+**Note:** if you do not do step 3, CI shows failures but does not stop a merge.
 
 ## Files
 
