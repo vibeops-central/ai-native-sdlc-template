@@ -1,5 +1,7 @@
 # Intent: {{change}}
 
+Status: draft
+<!-- draft -> approved: a human approves the intent and the spec together. -->
 **Owner (human):** @
 **Date:**
 

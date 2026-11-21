@@ -61,6 +61,10 @@ def add_change(repo, approve=False, lock=False):
     name = "0001-thing"
     (repo / "tests" / "acceptance" / name / "test_it.py").write_text("def test_ok():\n    assert True\n")
     if approve:
+        # Change 0003: approving a change means approving its intent (with an owner) too.
+        intent = repo / "changes" / name / "intent.md"
+        intent.write_text(intent.read_text().replace("Status: draft", "Status: approved", 1)
+                          .replace("**Owner (human):** @", "**Owner (human):** @owner", 1))
         spec = repo / "changes" / name / "spec.md"
         spec.write_text(spec.read_text().replace("Status: draft", "Status: approved"))
     if lock:

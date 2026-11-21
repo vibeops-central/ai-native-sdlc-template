@@ -12,8 +12,9 @@ Every change goes through five steps, as files in `changes/<NNNN-slug>/`:
    confirmed by a human. Never start without one.
 2. **Spec** (`spec.md`): behaviour, edge cases, and the acceptance tests in
    `tests/acceptance/<NNNN-slug>/`. You may draft both. **Stop here** and ask a human to
-   review. The human sets `Status: approved` (and, if the acceptance lock is on, runs
-   `python scripts/gate.py lock <change>`).
+   review. The human sets `Status: approved` in **both** `intent.md` and `spec.md` (and, if
+   the acceptance lock is on, runs `python scripts/gate.py lock <change>`). An approved
+   intent must name its human owner (`Owner (human): @handle`).
 3. **Plan** (`plan.md`): the files you will touch and the order, small steps. Keep it true:
    if the work drifts from the plan, update the plan in the same commit.
 4. **Build**: make the acceptance tests pass. Add any other tests you like.
