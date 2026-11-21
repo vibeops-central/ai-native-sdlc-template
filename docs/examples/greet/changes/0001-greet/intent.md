@@ -1,10 +1,11 @@
 # Intent: 0001-greet
 
-**Owner (human):** @ (whoever approves this example)
+Status: draft
+**Owner (human):** @
 **Date:** 2026-11-21
 
-> This is a worked example to try the loop end to end. Delete `changes/0001-greet/`,
-> `tests/acceptance/0001-greet/` and `src/example/` when you start your own project.
+> A worked example to try the loop end to end, on a branch you throw away.
+> See "Try it" in `docs/sdlc.md`.
 
 ## Problem
 New users of this template have no small change to practise the loop on.
