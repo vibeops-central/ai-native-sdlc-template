@@ -33,7 +33,7 @@ Risk: higher
 - Change 0002 is approved and merged, and its intent has no `Status:` line. This change
   adds `Status: approved` to 0002's intent, recording that Natu approved 0002 on 21 Nov.
   **Approving this spec confirms that record.**
-- Change 0001 (draft) gets `Status: draft` in its intent.
+- Change 0001 (draft) is left untouched: an intent with no `Status:` line counts as draft.
 
 ## Edge cases
 - An intent without any `Status:` line counts as draft.

@@ -12,7 +12,9 @@ Keep this true. If the work drifts from the plan, update it in the same commit.
 2. `docs/templates/intent.md`: add `Status: draft`. Update the comment in
    `docs/templates/spec.md`.
 3. Existing changes: `Status: approved` in 0002's intent (recording Natu's 21 Nov approval,
-   confirmed by approving this spec); `Status: draft` in 0001's intent.
+   confirmed by approving this spec). **Leave 0001 untouched:** an intent with no status line
+   already counts as draft, and touching 0001's folder makes `pr-check` require its draft
+   spec to be approved. (Corrected after the first build touched 0001.)
 4. AGENTS.md step 2 and REVIEW.md: approving a change means approving the intent and the
    spec.
 5. Update the test helpers in `tests/sdlc/test_gates.py` that approve a spec, so they also
@@ -22,7 +24,7 @@ Keep this true. If the work drifts from the plan, update it in the same commit.
 ## Files touched
 - `scripts/gate.py`
 - `docs/templates/intent.md`, `docs/templates/spec.md`
-- `changes/0001-greet/intent.md`, `changes/0002-change-classes/intent.md`
+- `changes/0002-change-classes/intent.md`
 - `AGENTS.md`, `REVIEW.md`
 - `tests/sdlc/test_gates.py`
 
